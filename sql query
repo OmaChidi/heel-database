@@ -1,1 +1,158 @@
+-- Create tables
+CREATE TABLE heels (
+    heel_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    brand VARCHAR(100),
+    release_year INT,
+    heel_height_cm DECIMAL(4,1),
+    color VARCHAR(50),
+    price_usd DECIMAL(10,2),
+    style VARCHAR(50),
+    material VARCHAR(50),
+    limited_edition BOOLEAN
+);
 
+CREATE TABLE brands (
+    brand_id INT PRIMARY KEY,
+    brand_name VARCHAR(100),
+    country VARCHAR(100),
+    founded_year INT,
+    founder VARCHAR(100)
+);
+
+CREATE TABLE heel_reviews (
+    review_id INT PRIMARY KEY,
+    heel_id INT,
+    review_source VARCHAR(100),
+    reviewer_name VARCHAR(100),
+    rating DECIMAL(2,1),
+    comment TEXT,
+    review_date DATE,
+    FOREIGN KEY (heel_id) REFERENCES heels(heel_id)
+);
+
+CREATE TABLE celeb_endorsements (
+    celeb_id INT PRIMARY KEY,
+    celeb_name VARCHAR(100),
+    heel_id INT,
+    event_worn VARCHAR(100),
+    event_year INT,
+    moment_description TEXT,
+    FOREIGN KEY (heel_id) REFERENCES heels(heel_id)
+);
+
+-- Insert data into heels
+INSERT INTO heels VALUES
+(1, 'So Kate', 'Christian Louboutin', 2013, 12.0, 'Black', 795.00, 'Stiletto', 'Patent Leather', FALSE),
+(2, 'Rockstud Pump', 'Valentino', 2010, 10.0, 'Nude', 950.00, 'Pump', 'Calfskin', FALSE),
+(3, 'Hangisi Pump', 'Manolo Blahnik', 2008, 9.5, 'Blue', 965.00, 'Pump', 'Satin', FALSE),
+(4, 'Tribute Sandal', 'Saint Laurent', 2007, 13.5, 'Brown', 875.00, 'Platform', 'Leather', FALSE),
+(5, 'Pigalle', 'Christian Louboutin', 2004, 10.0, 'Red', 695.00, 'Pump', 'Patent Leather', FALSE),
+(6, 'Romy Pump', 'Jimmy Choo', 1996, 8.5, 'Ivory', 750.00, 'Pump', 'Satin', FALSE),
+(7, 'J’Adior Slingback', 'Dior', 2017, 6.5, 'Beige', 890.00, 'Slingback', 'Textile', FALSE),
+(8, 'Wing Sandal', 'Giuseppe Zanotti', 2013, 11.0, 'Gold', 1300.00, 'Sandal', 'Leather', TRUE),
+(9, 'Belle Vivier Pump', 'Roger Vivier', 1965, 5.5, 'Black', 850.00, 'Pump', 'Leather', FALSE),
+(10, 'Nudist Sandal', 'Stuart Weitzman', 2013, 11.0, 'Silver', 398.00, 'Sandal', 'Synthetic', FALSE);
+
+-- Insert data into brands
+INSERT INTO brands VALUES
+(1, 'Christian Louboutin', 'France', 1991, 'Christian Louboutin'),
+(2, 'Valentino', 'Italy', 1960, 'Valentino Garavani'),
+(3, 'Manolo Blahnik', 'Spain', 1970, 'Manolo Blahnik'),
+(4, 'Saint Laurent', 'France', 1961, 'Yves Saint Laurent'),
+(5, 'Jimmy Choo', 'UK', 1996, 'Jimmy Choo'),
+(6, 'Dior', 'France', 1946, 'Christian Dior'),
+(7, 'Giuseppe Zanotti', 'Italy', 1994, 'Giuseppe Zanotti'),
+(8, 'Roger Vivier', 'France', 1937, 'Roger Vivier'),
+(9, 'Stuart Weitzman', 'USA', 1986, 'Stuart Weitzman');
+
+-- Insert data into heel_reviews
+INSERT INTO heel_reviews VALUES
+(1, 1, 'Vogue', 'Anna Wintour', 4.9, 'Timeless classic.', '2023-01-12'),
+(2, 2, 'Elle', 'Carmen Kass', 4.8, 'Chic and edgy.', '2023-03-10'),
+(3, 3, 'InStyle', 'Eva Chen', 4.7, 'Blue beauty!', '2023-04-05'),
+(4, 4, 'Harper''s Bazaar', 'Ashley Graham', 4.6, 'Power shoe.', '2023-05-01'),
+(5, 5, 'YouTube', 'HauteLeah', 4.5, 'Very Parisian.', '2023-06-15'),
+(6, 6, 'Cosmopolitan', 'Tina Knowles', 4.6, 'Dreamy wedding heel.', '2023-07-03'),
+(7, 7, 'Blog', 'StylebyAmeera', 4.3, 'Logo heaven.', '2023-08-01'),
+(8, 8, 'Red Carpet', 'Zendaya', 5.0, 'Iconic and bold.', '2023-09-19'),
+(9, 9, 'Bazaar', 'Leonie Hanne', 4.4, 'Vintage vibes.', '2023-10-11'),
+(10, 10, 'Vogue', 'Olivia Palermo', 4.2, 'Sleek and minimal.', '2023-11-01');
+
+-- Insert data into celeb_endorsements
+INSERT INTO celeb_endorsements VALUES
+(1, 'Rihanna', 1, 'Met Gala', 2014, 'Arrived in So Kate with jeweled gown.'),
+(2, 'Zendaya', 8, 'Oscars', 2021, 'Gold goddess moment.'),
+(3, 'Sarah Jessica Parker', 3, 'Sex and the City Movie', 2008, 'Wore blue Hangisi at her wedding.'),
+(4, 'Gigi Hadid', 2, 'CFDA Fashion Awards', 2016, 'Stunning in Rockstuds.'),
+(5, 'Jennifer Lopez', 4, 'Billboard Awards', 2019, 'Wore towering YSL sandals.');
+
+-- Q1: What is the most expensive heel? (ORDER BY + LIMIT)
+SELECT name, price_usd
+FROM heels
+ORDER BY price_usd DESC
+LIMIT 1;
+
+-- Q2: Which brand has the most heels in the top 10? (GROUP BY, COUNT)
+SELECT brand, COUNT(*) AS total_styles
+FROM heels
+GROUP BY brand
+ORDER BY total_styles DESC;
+
+-- Q3: Which heel has the highest average review rating? (JOIN + AVG)
+SELECT h.name, AVG(r.rating) AS avg_rating
+FROM heels h
+JOIN heel_reviews r ON h.heel_id = r.heel_id
+GROUP BY h.name
+ORDER BY avg_rating DESC
+LIMIT 1;
+
+-- Q4: What is the average heel height by style? (GROUP BY + AVG)
+SELECT style, ROUND(AVG(heel_height_cm), 2) AS avg_height_cm
+FROM heels
+GROUP BY style;
+
+-- Q5: List all heels with a rating above 4.5 and price under $900 (JOIN + WHERE)
+SELECT h.name, h.price_usd, r.rating
+FROM heels h
+JOIN heel_reviews r ON h.heel_id = r.heel_id
+WHERE r.rating > 4.5 AND h.price_usd < 900;
+
+-- Q6: Which heels are limited edition and cost above $1000? (WHERE + Boolean logic)
+SELECT name, price_usd
+FROM heels
+WHERE limited_edition = TRUE AND price_usd > 1000;
+
+-- Q7: Which heel was worn at the Oscars? (JOIN + WHERE)
+SELECT c.celeb_name, h.name AS heel_name, c.event_worn
+FROM celeb_endorsements c
+JOIN heels h ON c.heel_id = h.heel_id
+WHERE c.event_worn LIKE '%Oscars%';
+
+-- Q8: What styles are over 10cm tall and released before 2010? (WHERE)
+SELECT name, style, heel_height_cm, release_year
+FROM heels
+WHERE heel_height_cm > 10 AND release_year < 2010;
+
+-- Q9: How many heels were released per decade? (CASE + GROUP BY)
+SELECT 
+  CASE
+    WHEN release_year < 1970 THEN '1960s'
+    WHEN release_year BETWEEN 1970 AND 1979 THEN '1970s'
+    WHEN release_year BETWEEN 1980 AND 1989 THEN '1980s'
+    WHEN release_year BETWEEN 1990 AND 1999 THEN '1990s'
+    WHEN release_year BETWEEN 2000 AND 2009 THEN '2000s'
+    WHEN release_year BETWEEN 2010 AND 2019 THEN '2010s'
+    ELSE '2020s'
+  END AS decade,
+  COUNT(*) AS total_heels
+FROM heels
+GROUP BY decade;
+
+-- Q10: Rank heels by price within each brand (WINDOW FUNCTION)
+SELECT 
+  name,
+  brand,
+  price_usd,
+  RANK() OVER (PARTITION BY brand ORDER BY price_usd DESC) AS price_rank
+FROM heels;
